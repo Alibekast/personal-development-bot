@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: personal-development-bot
+    env: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "python bot.py"
+    envVars:
+      - key: TELEGRAM_API_TOKEN
+        value: "123456789:ABCDEFGHJKLMNOPQRSTUVWXYZ"
+    plan: free
