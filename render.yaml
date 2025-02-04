@@ -3,7 +3,7 @@ services:
     name: personal-development-bot
     env: python
     buildCommand: "pip install -r requirements.txt"
-    startCommand: "python src/bot.py"  # Жолды түзетіңіз, егер файл 'src' қалтасында болса
+    startCommand: "python bot.py"
     envVars:
       - key: TELEGRAM_API_TOKEN
         value: "8110633206:AAHwJgpPyK7vv8N9vU39fgCh1vU3MIOBYCE" # Өз API токеніңізді осы жерге жазыңыз
