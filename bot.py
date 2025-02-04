@@ -1,132 +1,86 @@
-import logging
+import asyncio
 from aiogram import Bot, Dispatcher, types
-from aiogram.utils import executor
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.filters import Command
+import logging
+import os
 
-# Telegram Bot API токенін жазу
-API_TOKEN = '8110633206:AAHwJgpPyK7vv8N9vU39fgCh1vU3MIOBYCE'  # Мұнда өзіңіздің API токеніңізді қойыңыз
+# 🔐 Telegram Bot API токенін қоршаған орта (environment variables) арқылы алу
+API_TOKEN = os.getenv("8110633206:AAHwJgpPyK7vv8N9vU39fgCh1vU3MIOBYCE")
 
-# Логирование
+# ✅ Логтарды баптау
 logging.basicConfig(level=logging.INFO)
 
-# Bot және Dispatcher инициализациясы
+# 🤖 Бот пен диспетчерді инициализациялау
 bot = Bot(token=API_TOKEN)
-dp = Dispatcher(bot)
+dp = Dispatcher()
 
-class PersonalDevelopmentBot:
-    def __init__(self):
-        self.data = {
-            'personal_development': {
-                'books': {
-                    'read': [],
-                    'recommendations': [
-                        "«Атомдық дағдылар» Джеймс Клир",
-                        "«7 тиімді дағды» Стивен Кови",
-                        "«Тұлғаның құрылымы» Карл Юнг"
-                    ]
-                },
-                'videos': {
-                    'youtube_links': [
-                        "https://youtube.com/personal-growth",
-                        "https://youtube.com/mindfulness-course"
-                    ]
-                },
-                'daily_practices': [
-                    "Күнделікті журнал жазбалары",
-                    "Медитация 15 минут",
-                    "SPLENDID әдісі бойынша жоспарлау"
-                ]
-            },
-            'skills_development': {
-                'categories': {
-                    'техникалық дағдылар': [],
-                    'әлеуметтік дағдылар': [],
-                    'шығармашылық дағдылар': []
-                },
-                'progress_tracking': {}
-            },
-            'time_management': {
-                'schedule': {},
-                'priority_matrix': []
-            },
-            'daily_tasks': {
-                'task_list': [],
-                'reminders': []
-            }
-        }
+# 📚 **Тұлғалық даму мәзірі**
+async def personal_dev_menu(message: types.Message):
+    keyboard = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text="📖 Оқылған кітаптар", callback_data="read_books")],
+            [InlineKeyboardButton(text="📚 Кеңес кітаптар", callback_data="recommend_books")],
+            [InlineKeyboardButton(text="🎥 Пайдалы видеолар", callback_data="videos")],
+            [InlineKeyboardButton(text="🌅 Күнделікті тәжірибелер", callback_data="practices")],
+            [InlineKeyboardButton(text="🔙 Артқа", callback_data="back")]
+        ]
+    )
+    await message.answer("📚 **Тұлғалық даму бөлімі**", reply_markup=keyboard)
 
-    # Боттың негізгі менюін көрсету
-    async def show_menu(self, message: types.Message):
-        await message.answer("\n🏆 Негізгі меню:\n"
-                             "1. Тұлғалық даму\n"
-                             "2. Дағдыларды дамыту\n"
-                             "3. Уақыт басқару\n"
-                             "4. Күнделікті тапсырмалар\n"
-                             "5. Шығу")
+# 📖 **Оқылған кітаптар тізімі**
+async def show_books(callback: types.CallbackQuery):
+    books = "📖 Оқылған кітаптар:\n- «Атомдық дағдылар» Джеймс Клир\n- «7 тиімді дағды» Стивен Кови"
+    await callback.message.answer(books)
 
-    # Тұлғалық даму бөлімі
-    async def personal_dev_menu(self, message: types.Message):
-        await message.answer("\n📚 Тұлғалық даму бөлімі:\n"
-                             "1. Оқылған кітаптар\n"
-                             "2. Кеңес кітаптар\n"
-                             "3. Пайдалы видеолар\n"
-                             "4. Күнделікті тәжірибелер\n"
-                             "5. Артқа")
-    
-    async def show_books(self, message: types.Message):
-        books = "\n".join(self.data['personal_development']['books']['read']) or "Кітаптар жоқ."
-        await message.answer(f"📖 Оқылған кітаптар тізімі:\n{books}")
+# 📚 **Кеңес кітаптар**
+async def show_recommendations(callback: types.CallbackQuery):
+    recommendations = "📚 Кеңес кітаптар:\n- «Тұлғаның құрылымы» Карл Юнг\n- «Дамудың 5 қадамы» Брайан Трейси"
+    await callback.message.answer(recommendations)
 
-    async def show_recommendations(self, message: types.Message):
-        recommendations = "\n".join(self.data['personal_development']['books']['recommendations'])
-        await message.answer(f"🌟 Кеңес кітаптар:\n{recommendations}")
+# 🎥 **Пайдалы видеолар**
+async def show_videos(callback: types.CallbackQuery):
+    videos = "🎥 Пайдалы видеолар:\n1️⃣ https://youtube.com/personal-growth\n2️⃣ https://youtube.com/mindfulness-course"
+    await callback.message.answer(videos)
 
-    async def show_videos(self, message: types.Message):
-        videos = "\n".join(self.data['personal_development']['videos']['youtube_links'])
-        await message.answer(f"🎥 Пайдалы видеолар:\n{videos}")
+# 🌅 **Күнделікті тәжірибелер**
+async def show_practices(callback: types.CallbackQuery):
+    practices = "🌅 Күнделікті тәжірибелер:\n✅ Күнделікті журнал жазу\n✅ Медитация 15 минут\n✅ SPLENDID әдісі бойынша жоспарлау"
+    await callback.message.answer(practices)
 
-    async def show_practices(self, message: types.Message):
-        practices = "\n".join(self.data['personal_development']['daily_practices'])
-        await message.answer(f"🌅 Күнделікті тәжірибелер:\n{practices}")
+# 🔙 **Артқа**
+async def go_back(callback: types.CallbackQuery):
+    await callback.message.answer("🔙 Артқа қайту үшін /start басыңыз.")
 
-    async def handle_message(self, message: types.Message):
-        if message.text == '/start':
-            await message.answer("🎉 Сәлем! Менің ботыма қош келдіңіз! Өз даму жолында көмек көрсету үшін мен осындамын.")
-            await self.show_menu(message)
+# 📌 **Бот командаларын тіркеу**
+@dp.message(Command("start"))
+async def start_command(message: types.Message):
+    await message.answer("🚀 Даму платформасына қош келдіңіз! Мұнда сіз тұлғалық даму, пайдалы кітаптар мен тәжірибелер туралы ақпарат таба аласыз.")
+    await personal_dev_menu(message)
 
-        elif message.text == '1':
-            await self.personal_dev_menu(message)
+@dp.callback_query(lambda c: c.data == "read_books")
+async def handle_read_books(callback: types.CallbackQuery):
+    await show_books(callback)
 
-        elif message.text == '2':
-            await message.answer("😎 Дағдыларды дамыту бөлімін жақында қосамыз!")
-        elif message.text == '3':
-            await message.answer("🗓 Уақыт басқару бөлімін жақында қосамыз!")
-        elif message.text == '4':
-            await message.answer("⏳ Күнделікті тапсырмалар бөлімін жақында қосамыз!")
-        elif message.text == '5':
-            await message.answer("🎉 Сау болыңыз!")
-        else:
-            await message.answer("❓ Белгісіз таңдау! Қайтадан таңдау жасаңыз.")
-    
-    async def process_command(self, message: types.Message):
-        if message.text == '1':
-            await self.show_books(message)
-        elif message.text == '2':
-            await self.show_recommendations(message)
-        elif message.text == '3':
-            await self.show_videos(message)
-        elif message.text == '4':
-            await self.show_practices(message)
+@dp.callback_query(lambda c: c.data == "recommend_books")
+async def handle_recommend_books(callback: types.CallbackQuery):
+    await show_recommendations(callback)
 
-# Ботты іске қосу
-if __name__ == '__main__':
-    bot_instance = PersonalDevelopmentBot()
+@dp.callback_query(lambda c: c.data == "videos")
+async def handle_videos(callback: types.CallbackQuery):
+    await show_videos(callback)
 
-    @dp.message_handler(commands=['start'])
-    async def start_command(message: types.Message):
-        await bot_instance.handle_message(message)
+@dp.callback_query(lambda c: c.data == "practices")
+async def handle_practices(callback: types.CallbackQuery):
+    await show_practices(callback)
 
-    @dp.message_handler()
-    async def echo(message: types.Message):
-        await bot_instance.handle_message(message)
-    
-    executor.start_polling(dp, skip_updates=True)
+@dp.callback_query(lambda c: c.data == "back")
+async def handle_back(callback: types.CallbackQuery):
+    await go_back(callback)
+
+# 🏁 **Ботты іске қосу**
+async def main():
+    await dp.start_polling(bot)
+
+if __name__ == "__main__":
+    asyncio.run(main())
