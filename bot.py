@@ -12,7 +12,7 @@ API_TOKEN = os.getenv("8110633206:AAHwJgpPyK7vv8N9vU39fgCh1vU3MIOBYCE")
 logging.basicConfig(level=logging.INFO)
 
 # 🤖 Бот пен диспетчерді инициализациялау
-bot = Bot(token=API_TOKEN)
+bot = Bot(token=8110633206:AAHwJgpPyK7vv8N9vU39fgCh1vU3MIOBYCE)
 dp = Dispatcher()
 
 # 📚 **Тұлғалық даму мәзірі**
